@@ -1,0 +1,85 @@
+version: '3'
+
+services: 
+
+  back-end:
+    build: 
+      context: node
+    container_name: back-end
+    working_dir: /usr/src/app 
+    volumes: 
+      - ./node:/usr/src/app
+      - /usr/src/app/node_modules
+    tty: true
+    ports: 
+      - "3000:3000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGO_URI=mongodb://root:root@mongo:27017
+      - SECRET_KEY=asflsajfpoasflsajf
+      - NEWS_API_KEY=2098f2616cd540afb0594a3acd72e1f8
+    command: node server.js
+    depends_on:
+      - redis
+      - mongo
+    networks:
+      - node-network
+
+  front-end:
+    build: 
+      context: react
+    container_name: front-end
+    working_dir: /usr/src/app
+    networks: 
+      - node-network
+    volumes: 
+      - ./react:/usr/src/app
+      - /usr/src/app/node_modules
+    tty: true
+    ports: 
+      - "5173:5173"
+    environment: 
+      - VITE_BASE_URL=http://localhost:8000/api/v1
+    command: npm run dev
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - node-network
+
+  redis:
+    image: redis:latest
+    networks: 
+      - node-network
+    ports:
+      - "6379:6379"
+
+  nginx-server:
+    build: 
+      context: nginx
+    container_name: nginx
+    restart: always
+    tty: true
+    ports: 
+      - "8000:80"
+    networks: 
+      - node-network
+    depends_on:
+       - back-end
+       - front-end
+  
+networks: 
+  node-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
