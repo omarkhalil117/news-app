@@ -18,7 +18,6 @@ function Navbar() {
           email: '',
           subs: new Set()
         })
-        console.log(user);
         navigate('/');
       })
       .catch(err => {

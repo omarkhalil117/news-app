@@ -25,7 +25,6 @@ function Sources() {
     setIsLoading(true);
     axiosInstance.get(`/sources?page=${page}&limit=${itemsPerPage}`)
       .then((res) => {
-        console.log(res.data)
         setSources(res.data.sources);
         setTotalPages(Math.ceil(res.data.total / itemsPerPage));
         setIsLoading(false);

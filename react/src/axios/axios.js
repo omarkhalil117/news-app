@@ -2,7 +2,7 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
-  withCredentials: true 
+  withCredentials: true
 });
 
 axiosInstance.interceptors.response.use(
@@ -13,9 +13,8 @@ axiosInstance.interceptors.response.use(
     if (error.response.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const response = await axiosInstance.post('/refresh-token');
-        console.log(response.data.message);
-        return axiosInstance(originalRequest); 
+        await axiosInstance.post('/refresh-token');
+        return axiosInstance(originalRequest);
       } catch (refreshError) {
         console.error('Error refreshing token:', refreshError.response.data.message);
       }
