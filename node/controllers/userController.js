@@ -111,11 +111,10 @@ const getNews = catchAsync(async (req, res) => {
 
 const getLogs = catchAsync(async (req, res) => {
   const { id } = jwt.decode(req.cookies.token);
-  const key = `user:${id}:Logs`;
-  const logs = await client.lRange(key, 0, -1);
 
-  const parsedLogs = logs.map((log) => JSON.parse(log));
-  return res.json({ logs: parsedLogs });
+  const logs = await User.findOne({ _id: id }, { logs: 1, _id: 0 })
+
+  return res.json({ logs });
 });
 
 module.exports = {

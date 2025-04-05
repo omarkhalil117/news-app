@@ -19,18 +19,24 @@ const login = catchAsync(async (req, res) => {
   const correct = await user.correctPassword(password, user.password);
 
   const logInfo = {
-    userName: user.fullName,
     status: '',
     timestamp: new Date().toISOString(),
   };
-  const key = `user:${user._id}:Logs`;
 
   if (!user || !correct) {
     logger.error(`User ${user.fullName} failed to Log in !`);
+
     logInfo.status = 'failed';
 
-    client.lPush(key, JSON.stringify(logInfo));
-    client.lTrim(key, 0, 9);
+    await User.updateOne({ _id: user._id }, {
+      $push: {
+        logs: {
+          $each: [logInfo],
+          $slice: -10,
+          $sort: { timestamp: -1 }
+        }
+      }
+    })
 
     return res.status(401).json({ message: 'Invalid credentials' });
   }
@@ -44,8 +50,15 @@ const login = catchAsync(async (req, res) => {
   res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false, sameSite: 'Strict' });
 
   logInfo.status = 'success';
-  client.lPush(key, JSON.stringify(logInfo));
-  client.lTrim(key, 0, 9);
+  await User.updateOne({ _id: user._id }, {
+    $push: {
+      logs: {
+        $each: [logInfo],
+        $slice: -10,
+        $sort: { timestamp: -1 }
+      }
+    }
+  })
 
   return res.status(200).json({
     message: `Welcome ${user.fullName.split(' ')[0]}`,
@@ -94,7 +107,7 @@ const refreshToken = (req, res) => {
       return res.status(403).json({ message: 'Invalid refresh token' });
     }
 
-    const newToken = jwt.sign({ id: user._id , email: user.email }, SECRET_KEY, { expiresIn: '15m' });
+    const newToken = jwt.sign({ id: user._id, email: user.email }, SECRET_KEY, { expiresIn: '15m' });
     res.cookie('token', newToken, { httpOnly: true, secure: false, sameSite: 'Strict' });
 
     return res.status(200).json({ message: 'Token refreshed' });

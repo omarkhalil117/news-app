@@ -42,6 +42,12 @@ const userSchema = new mongoose.Schema(
     subscriptions: {
       type: Array,
     },
+    logs: {
+      type: [{
+        status: String,
+        timestamp: Date,
+      }],
+    }
   },
   { timestamps: true },
 );
@@ -63,7 +69,3 @@ userSchema.pre('save', async function (next) {
 });
 
 module.exports = mongoose.model('User', userSchema);
-// logs: {
-//   type: Array,
-//   maxLength: 10,
-// }
