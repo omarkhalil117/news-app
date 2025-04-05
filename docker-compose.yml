@@ -17,8 +17,6 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URI=mongodb://root:root@mongo:27017
-      - SECRET_KEY=asflsajfpoasflsajf
-      - NEWS_API_KEY=2098f2616cd540afb0594a3acd72e1f8
     command: node server.js
     depends_on:
       - redis
