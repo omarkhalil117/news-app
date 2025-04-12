@@ -148,11 +148,11 @@ volumes:
 	* `NEWS_API_KEY=your_news_api_key
 	SECRET_KEY=your_jwt_secret_here`
 
-Note : to get your news api key from this [link](https://newsapi.org/register)`
+Note : to get your news api key from this [link](https://newsapi.org/register)
+
+1. **Build and run with Docker** `docker-compose up --build
 `
-1. **Build and run with Docker **`docker-compose up --build
-`
-1. **Access the application **`http://localhost:8000`
+1. **Access the application** `http://localhost:8000`
 ## 🌟 Highlights
 * **Optimized Performance**: Redis caching reduces API response times by up to 80%
 * **Scalable Architecture**: Containerized setup allows easy horizontal scaling
